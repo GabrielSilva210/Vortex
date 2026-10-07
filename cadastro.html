@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Criar conta</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="modalCaixa" style="margin: 80px auto;">
+    <h3>Criar conta</h3>
+
+    <label class="campo">Nome
+      <input type="text" id="cadNome">
+    </label>
+    <label class="campo">E-mail
+      <input type="email" id="cadEmail">
+    </label>
+    <label class="campo">Senha
+      <input type="password" id="cadSenha">
+    </label>
+    <label class="campo">Confirmar senha
+      <input type="password" id="cadConfirmar">
+    </label>
+
+    <p id="cadErro"></p>
+
+    <div class="botoesForm">
+      <a href="login.html">Já tenho conta</a>
+      <button id="btnCadastrar" class="btnPrimario">Criar conta</button>
+    </div>
+  </div>
+  <script type="module" src="js/cadastro.js"></script>
+</body>
+</html>
