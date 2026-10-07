@@ -1,0 +1,5 @@
+renderizar();
+
+iniciarPerfil();
+iniciarModal();
+iniciarHome();

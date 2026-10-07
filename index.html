@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gerenciador de Tarefas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="painel">
+
+    <header class="topo">
+      <button id="btnMembro" class="btnIcone" title="Adicionar membro">+</button>
+
+      <div class="usuario">
+        <button id="btnUsuario" class="avatar">G</button>
+        <div id="menuUsuario" class="menu escondido">
+          <p class="menuNome">Gabriel</p>
+          <p class="menuEmail">gabriel@email.com</p>
+          <button>Meu perfil</button>
+          <button>Configurações</button>
+          <button id="btnTema">Tema claro</button>
+          <button class="sair">Sair</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="quadro">
+      <section class="coluna">
+        <h2>Em aberto</h2>
+        <div class="lista" id="aberto"></div>
+        <button id="btnAdd" class="btnNovaTarefa" title="Nova tarefa">+</button>
+      </section>
+
+      <section class="coluna">
+        <h2>Em andamento</h2>
+        <div class="lista" id="andamento"></div>
+      </section>
+
+      <section class="coluna">
+        <h2>Concluídos</h2>
+        <div class="lista" id="concluido"></div>
+      </section>
+    </main>
+
+  </div>
+
+  <div id="modal" class="modal escondido">
+    <div class="modalCaixa">
+
+      <div class="modalBotoes">
+        <button id="btnEdit" class="btn-modal" title="Editar tarefa"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_45_20)">
+<path d="M9.16663 3.33332H3.33329C2.89127 3.33332 2.46734 3.50891 2.15478 3.82147C1.84222 4.13403 1.66663 4.55796 1.66663 4.99999V16.6667C1.66663 17.1087 1.84222 17.5326 2.15478 17.8452C2.46734 18.1577 2.89127 18.3333 3.33329 18.3333H15C15.442 18.3333 15.8659 18.1577 16.1785 17.8452C16.491 17.5326 16.6666 17.1087 16.6666 16.6667V10.8333M15.4166 2.08332C15.7481 1.7518 16.1978 1.56555 16.6666 1.56555C17.1355 1.56555 17.5851 1.7518 17.9166 2.08332C18.2481 2.41484 18.4344 2.86448 18.4344 3.33332C18.4344 3.80216 18.2481 4.2518 17.9166 4.58332L9.99996 12.5L6.66663 13.3333L7.49996 9.99999L15.4166 2.08332Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_45_20">
+<rect width="20" height="20" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</button>
+        <button id="btnFechar" class="btnModal" title="Fechar">×</button>
+      </div>
+
+      <div id="modoVer">
+        <h3 id="verTitulo"></h3>
+        <span id="verPrioridade" class="etiqueta"></span>
+        <p id="verDescricao"></p>
+
+        <div id="verAnexo"></div>
+
+        <label class="campo">
+          Mover para:
+          <select id="verColuna">
+            <option value="aberto">Em aberto</option>
+            <option value="andamento">Em andamento</option>
+            <option value="concluido">Concluídos</option>
+          </select>
+        </label>
+
+        <button id="btnExcluir" class="btnExcluir">Excluir tarefa</button>
+      </div>
+
+      <div id="modoEditar" class="escondido">
+        <h3 id="editarJanela">Nova tarefa</h3>
+
+        <label class="campo">
+          Título
+          <input type="text" id="inputTitulo">
+        </label>
+
+        <label class="campo">
+          Descrição
+          <textarea id="inputDescricao" rows="3"></textarea>
+        </label>
+
+        <label class="campo">
+          Prioridade
+          <select id="inputPrioridade">
+            <option value="baixa">❄️ Baixa</option>
+            <option value="media">⚠️ Média</option>
+            <option value="alta">⚡ Alta</option>
+            <option value="urgente">🔥 Urgente</option>
+          </select>
+        </label>
+
+        <div id="areaUpload" class="upload">
+          Clique para anexar um arquivo
+          <small>SVG, PNG, JPG ou PDF (até 1 MB)</small>
+        </div>
+        <input type="file" id="arquivo" accept=".svg,.png,.jpg,.jpeg,.pdf" hidden>
+        <p id="nomeArquivo"></p>
+        <div id="removerUpload" class="uploadRemovido">
+          <button id="btnRemoverAnexo" class="btnExcluir">Excluir Upload</button>
+        </div>
+
+        <div class="botoesForm">
+          <button id="btnCancelar" class="btnSecundario">Cancelar</button>
+          <button id="btnSalvar" class="btnPrimario">Salvar</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/perfil.js"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
