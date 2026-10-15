@@ -1,7 +1,11 @@
+import { estado, procurarTarefa, salvarTarefa, montarEtiqueta } from "./state.js";
+import { abrirVer, abrirEditar } from "./modal.js";
+
 const botaoAdd = document.getElementById("btnAdd");
 const COLUNAS = ["aberto", "andamento", "concluido"];
 
 let idArrastando = null;
+let idParaAnimar = null;
 
 function criarCard(tarefa) {
   const card = document.createElement("div");
@@ -46,14 +50,27 @@ function criarCard(tarefa) {
   return card;
 }
 
-function renderizar() {
+export function renderizar() {
   COLUNAS.forEach(function (id) {
     document.getElementById(id).innerHTML = "";
   });
 
-  tarefas.forEach(function (tarefa) {
+  estado.tarefas.forEach(function (tarefa) {
     document.getElementById(tarefa.coluna).appendChild(criarCard(tarefa));
   });
+
+  if (idParaAnimar !== null) {
+    const cardSolto = document.querySelector('.card[data-id="' + idParaAnimar + '"]');
+    if (cardSolto) {
+      cardSolto.classList.add("solto");
+    }
+    idParaAnimar = null;
+  }
+
+  // se o modal estiver aberto em modo "ver", atualiza com a versão mais recente
+  if (estado.tarefaAtual) {
+    estado.tarefaAtual = procurarTarefa(estado.tarefaAtual.id) || estado.tarefaAtual;
+  }
 }
 
 function cliqueNoCard(evento) {
@@ -94,18 +111,16 @@ function soltouNaLista(evento) {
 
   const idSolto = idArrastando;
   const tarefa = procurarTarefa(idSolto);
-  tarefa.coluna = lista.id;
 
-  salvar();
-  renderizar();
-
-  const cardSolto = document.querySelector('.card[data-id="' + idSolto + '"]');
-  if (cardSolto) {
-    cardSolto.classList.add("solto");
+  if (!tarefa || tarefa.coluna === lista.id) {
+    return;
   }
+
+  idParaAnimar = idSolto;
+  salvarTarefa({ ...tarefa, coluna: lista.id });
 }
 
-function iniciarHome() {
+export function iniciarHome() {
   botaoAdd.addEventListener("click", function () {
     abrirEditar(null);
   });

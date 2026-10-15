@@ -1,3 +1,5 @@
+import { estado, salvarTarefa, excluirTarefaDb, montarEtiqueta } from "./state.js";
+
 const modal = document.getElementById("modal");
 const botaoFechar = document.getElementById("btnFechar");
 const botaoLapis = document.getElementById("btnEdit");
@@ -23,10 +25,12 @@ const botaoRemoverAnexo = document.getElementById("btnRemoverAnexo");
 const botaoCancelar = document.getElementById("btnCancelar");
 const botaoSalvar = document.getElementById("btnSalvar");
 
-const TAMANHO_MAXIMO = 1000000; 
+// o Firestore limita cada documento a ~1 MiB e o anexo vira texto base64 (+33%),
+// então 700 KB de arquivo é o máximo seguro
+const TAMANHO_MAXIMO = 700000;
 
-function abrirVer(tarefa) {
-  tarefaAtual = tarefa;
+export function abrirVer(tarefa) {
+  estado.tarefaAtual = tarefa;
 
   verTitulo.textContent = tarefa.titulo;
   verDescricao.textContent = tarefa.descricao;
@@ -56,24 +60,19 @@ function abrirVer(tarefa) {
 }
 
 function mudarColuna() {
-  tarefaAtual.coluna = verColuna.value;
-  salvar();
-  renderizar();
+  const atualizada = { ...estado.tarefaAtual, coluna: verColuna.value };
+  estado.tarefaAtual = atualizada;
+  salvarTarefa(atualizada);
 }
 
 function excluirTarefa() {
-  tarefas = tarefas.filter(function (tarefa) {
-    return tarefa.id !== tarefaAtual.id;
-  });
-
-  salvar();
-  renderizar();
+  excluirTarefaDb(estado.tarefaAtual.id);
   fecharModal();
 }
 
 function atualizarAreaAnexo() {
-  if (anexoTemp) {
-    nomeArquivo.textContent = "Arquivo: " + anexoTemp.nome;
+  if (estado.anexoTemp) {
+    nomeArquivo.textContent = "Arquivo: " + estado.anexoTemp.nome;
     removerUpload.style.display = "block";
   } else {
     nomeArquivo.textContent = "";
@@ -81,8 +80,8 @@ function atualizarAreaAnexo() {
   }
 }
 
-function abrirEditar(tarefa) {
-  tarefaAtual = tarefa;
+export function abrirEditar(tarefa) {
+  estado.tarefaAtual = tarefa;
   inputArquivo.value = "";
 
   if (tarefa === null) {
@@ -90,13 +89,13 @@ function abrirEditar(tarefa) {
     inputTitulo.value = "";
     inputDescricao.value = "";
     inputPrioridade.value = "baixa";
-    anexoTemp = null;
+    estado.anexoTemp = null;
   } else {
     editarJanela.textContent = "Editar tarefa";
     inputTitulo.value = tarefa.titulo;
     inputDescricao.value = tarefa.descricao;
     inputPrioridade.value = tarefa.prioridade;
-    anexoTemp = tarefa.anexo;
+    estado.anexoTemp = tarefa.anexo;
   }
 
   atualizarAreaAnexo();
@@ -110,7 +109,7 @@ function abrirEditar(tarefa) {
 
 function fecharModal() {
   modal.classList.add("escondido");
-  tarefaAtual = null;
+  estado.tarefaAtual = null;
 }
 
 function salvarEdicao() {
@@ -121,34 +120,34 @@ function salvarEdicao() {
     return;
   }
 
-  if (tarefaAtual === null) {
-    tarefas.push({
+  if (estado.tarefaAtual === null) {
+    salvarTarefa({
       id: Date.now(),
       titulo: titulo,
       descricao: inputDescricao.value.trim(),
       coluna: "aberto",
       prioridade: inputPrioridade.value,
-      anexo: anexoTemp
+      anexo: estado.anexoTemp
     });
-    salvar();
-    renderizar();
     fecharModal();
   } else {
-    tarefaAtual.titulo = titulo;
-    tarefaAtual.descricao = inputDescricao.value.trim();
-    tarefaAtual.prioridade = inputPrioridade.value;
-    tarefaAtual.anexo = anexoTemp;
-    salvar();
-    renderizar();
-    abrirVer(tarefaAtual);
+    const atualizada = {
+      ...estado.tarefaAtual,
+      titulo: titulo,
+      descricao: inputDescricao.value.trim(),
+      prioridade: inputPrioridade.value,
+      anexo: estado.anexoTemp
+    };
+    salvarTarefa(atualizada);
+    abrirVer(atualizada);
   }
 }
 
 function cancelarEdicao() {
-  if (tarefaAtual === null) {
+  if (estado.tarefaAtual === null) {
     fecharModal();
   } else {
-    abrirVer(tarefaAtual);
+    abrirVer(estado.tarefaAtual);
   }
 }
 
@@ -160,7 +159,7 @@ function escolherArquivo() {
   }
 
   if (arquivo.size > TAMANHO_MAXIMO) {
-    alert("Arquivo muito grande. Escolha um arquivo de até 1 MB.");
+    alert("Arquivo muito grande. Escolha um arquivo de até 700 KB.");
     inputArquivo.value = "";
     return;
   }
@@ -168,7 +167,7 @@ function escolherArquivo() {
   const leitor = new FileReader();
 
   leitor.onload = function () {
-    anexoTemp = { nome: arquivo.name, tipo: arquivo.type, dados: leitor.result };
+    estado.anexoTemp = { nome: arquivo.name, tipo: arquivo.type, dados: leitor.result };
     atualizarAreaAnexo();
   };
 
@@ -180,14 +179,14 @@ function escolherArquivo() {
 }
 
 function removerAnexo() {
-  anexoTemp = null;
+  estado.anexoTemp = null;
   inputArquivo.value = "";
   atualizarAreaAnexo();
 }
 
-function iniciarModal() {
+export function iniciarModal() {
   botaoLapis.addEventListener("click", function () {
-    abrirEditar(tarefaAtual);
+    abrirEditar(estado.tarefaAtual);
   });
 
   botaoSalvar.addEventListener("click", salvarEdicao);
